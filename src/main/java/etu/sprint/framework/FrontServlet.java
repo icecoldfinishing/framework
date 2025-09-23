@@ -3,6 +3,7 @@ package etu.sprint.framework;
 import etu.sprint.framework.utility.AnnotationScanner;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.Map;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -53,9 +54,25 @@ public class FrontServlet extends HttpServlet {
             Mapping mapping = this.urlMappings.get(url);
 
             if (mapping != null) {
-                out.println("<p style='color:green;'><b>SUCCESS:</b> URL found.</p>");
-                out.println("<p><b>Mapped to Controller:</b> " + mapping.getClassName() + "</p>");
-                out.println("<p><b>Mapped to Method:</b> " + mapping.getMethodName() + "</p>");
+                try {
+                    Class<?> controllerClass = Class.forName(mapping.getClassName());
+                    Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
+                    Method method = controllerClass.getMethod(mapping.getMethodName());
+                    Object result = method.invoke(controllerInstance);
+
+                    out.println("<p style='color:green;'><b>SUCCESS:</b> URL found.</p>");
+                    out.println("<p><b>Mapped to Controller:</b> " + mapping.getClassName() + "</p>");
+                    out.println("<p><b>Mapped to Method:</b> " + mapping.getMethodName() + "</p>");
+                    out.println("<h2>Controller Response:</h2>");
+                    if (result != null) {
+                        out.println("<div>" + result.toString() + "</div>");
+                    }
+
+                } catch (Exception e) {
+                    out.println("<p style='color:red;'><b>ERROR:</b> " + e.getMessage() + "</p>");
+                    // For debugging, print stack trace to servlet log
+                    getServletContext().log("Error invoking method for URL: " + url, e);
+                }
             } else {
                 out.println("<p style='color:red;'><b>ERROR 404:</b> No mapping found for this URL.</p>");
             }
