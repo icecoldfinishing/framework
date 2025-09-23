@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.Map;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -36,49 +37,43 @@ public class FrontServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            String requestURI = request.getRequestURI();
-            String contextPath = request.getContextPath();
-            String url = requestURI.substring(contextPath.length());
+        String requestURI = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String url = requestURI.substring(contextPath.length());
 
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet FrontServlet</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Framework Response</h1>");
-            out.println("<p><b>Requested URL:</b> " + url + "</p>");
+        Mapping mapping = this.urlMappings.get(url);
 
-            Mapping mapping = this.urlMappings.get(url);
+        if (mapping != null) {
+            try {
+                Class<?> controllerClass = Class.forName(mapping.getClassName());
+                Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
+                Method method = controllerClass.getMethod(mapping.getMethodName());
+                Object result = method.invoke(controllerInstance);
 
-            if (mapping != null) {
-                try {
-                    Class<?> controllerClass = Class.forName(mapping.getClassName());
-                    Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
-                    Method method = controllerClass.getMethod(mapping.getMethodName());
-                    Object result = method.invoke(controllerInstance);
-
-                    out.println("<p style='color:green;'><b>SUCCESS:</b> URL found.</p>");
-                    out.println("<p><b>Mapped to Controller:</b> " + mapping.getClassName() + "</p>");
-                    out.println("<p><b>Mapped to Method:</b> " + mapping.getMethodName() + "</p>");
-                    out.println("<h2>Controller Response:</h2>");
-                    if (result != null) {
-                        out.println("<div>" + result.toString() + "</div>");
+                if (result instanceof ModelView) {
+                    ModelView modelView = (ModelView) result;
+                    for (Map.Entry<String, Object> entry : modelView.getData().entrySet()) {
+                        request.setAttribute(entry.getKey(), entry.getValue());
                     }
-
-                } catch (Exception e) {
-                    out.println("<p style='color:red;'><b>ERROR:</b> " + e.getMessage() + "</p>");
-                    // For debugging, print stack trace to servlet log
-                    getServletContext().log("Error invoking method for URL: " + url, e);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("/views/" + modelView.getViewName());
+                    dispatcher.forward(request, response);
+                } else {
+                    // Handle cases where the controller returns something else (e.g., a String for REST APIs)
+                    response.setContentType("text/html;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        out.println("<h1>Framework Response</h1>");
+                        out.println("<p>Controller returned an unexpected type.</p>");
+                        if (result != null) {
+                            out.println("<p>" + result.toString() + "</p>");
+                        }
+                    }
                 }
-            } else {
-                out.println("<p style='color:red;'><b>ERROR 404:</b> No mapping found for this URL.</p>");
-            }
 
-            out.println("</body>");
-            out.println("</html>");
+            } catch (Exception e) {
+                throw new ServletException("Error invoking method for URL: " + url, e);
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No mapping found for this URL: " + url);
         }
     }
 

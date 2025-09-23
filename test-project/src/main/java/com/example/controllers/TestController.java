@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import etu.sprint.framework.ModelView;
 import etu.sprint.framework.annotation.Controller;
 import etu.sprint.framework.annotation.Url;
 
@@ -7,15 +8,23 @@ import etu.sprint.framework.annotation.Url;
 public class TestController {
 
     @Url("/hello")
-    public String sayHello() {
-        // In a future sprint, this method would return a ModelView
-        System.out.println("The sayHello() method is called!");
-        return "Hello from TestController!";
+    public ModelView sayHello() {
+        ModelView modelView = new ModelView("hello.jsp");
+        modelView.addObject("message", "Hello from TestController!");
+        return modelView;
     }
 
     @Url("/test-url")
-    public String anotherTest() {
-        System.out.println("The anotherTest() method is called!");
-        return "Another test from TestController!";
+    public ModelView anotherTest() {
+        ModelView modelView = new ModelView("test.jsp");
+        modelView.addObject("message", "Another test from TestController!");
+        return modelView;
+    }
+
+    @Url("/")
+    public ModelView home() {
+        ModelView modelView = new ModelView("home.jsp");
+        modelView.addObject("message", "This is the home page.");
+        return modelView;
     }
 }
