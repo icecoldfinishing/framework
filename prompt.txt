@@ -1,0 +1,3 @@
+corrige dans le src java etc etc elle ne doit contenir que frontservlet seulement pas de utility nimapping ni model view 
+donc lobjectif c est que si l url n est pas trouve elle passe par front servlet et affiche url inconnu pour cette url sinon on affiche la contenue de la page
+et la class frontservlet contient doget dopost qui appelle service et c est service qui fait les fonctionnelite reqeust getwriter println

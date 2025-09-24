@@ -1,15 +1,15 @@
- ./script.bat
+
+PS D:\Framework\framework> ./script.bat
 'D:\Progtool\apache-tomcat-10.1.28\webapps' n’est pas reconnu en tant que commande interne
 ou externe, un programme exécutable ou un fichier de commandes.
 Nettoyage des anciens builds...
 Nettoyage termine.
 Compilation du Framework...
-D:\Framework\framework\src\main\java\etu\sprint\framework\FrontServlet.java:57: error: cannot find symbol
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("/views/" + modelView.getViewName());
-                    ^
-  symbol:   class RequestDispatcher
-  location: class FrontServlet
-1 error
-Erreur lors de la compilation du framework.
+Framework compile.
+Creation du fichier framework.jar...
+framework.jar cree dans WEB-INF/lib.
+Compilation du projet de test...
+Fichier introuvable
+error: no source files
+Erreur lors de la compilation du projet de test.
 Appuyez sur une touche pour continuer... 
-PS D:\Framework\framework> 

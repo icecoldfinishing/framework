@@ -8,8 +8,8 @@
         <servlet-name>FrontServlet</servlet-name>
         <servlet-class>etu.sprint.framework.FrontServlet</servlet-class>
         <init-param>
-            <param-name>scan-package</param-name>
-            <param-value>com.example.controllers</param-value> <!-- IMPORTANT: Changez ceci pour votre package de contrôleurs -->
+            <param-name>routes-file</param-name>
+            <param-value>/WEB-INF/routes.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
