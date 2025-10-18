@@ -1,3 +1,11 @@
-corrige dans le src java etc etc elle ne doit contenir que frontservlet seulement pas de utility nimapping ni model view 
-donc lobjectif c est que si l url n est pas trouve elle passe par front servlet et affiche url inconnu pour cette url sinon on affiche la contenue de la page
-et la class frontservlet contient doget dopost qui appelle service et c est service qui fait les fonctionnelite reqeust getwriter println
+voici lerreur lorsque jaccede a.html
+État HTTP 500 – Erreur interne du serveur
+Type Rapport d'exception
+message L'exécution de la servlet a lancé une exception
+description Le serveur a rencontré une erreur interne qui l'a empêché de satisfaire la requête.
+exception
+jakarta.servlet.ServletException: L'exécution de la servlet a lancé une exception
+	org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	etu.sprint.framework.FrontServlet.service(FrontServlet.java:21)
+	jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)

@@ -2,7 +2,6 @@ package etu.sprint.framework;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,29 +11,36 @@ public class FrontServlet extends HttpServlet {
 
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String requestURI = request.getRequestURI();
         String contextPath = request.getContextPath();
         String url = requestURI.substring(contextPath.length());
 
-        String viewName = null;
-        if ("/".equals(url)) {
-            viewName = "home.jsp";
-        } else if ("/hello".equals(url)) {
-            viewName = "hello.jsp";
-        } else if ("/test-url".equals(url)) {
-            viewName = "test.jsp";
+        // 🔹 Ressources statiques
+        if (url.startsWith("/html/") || url.startsWith("/views/") || url.endsWith(".css") || url.endsWith(".js") || url.endsWith(".png")) {
+            try (java.io.InputStream is = getServletContext().getResourceAsStream(url)) {
+                if (is != null) {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = is.read(buffer)) != -1) {
+                        response.getOutputStream().write(buffer, 0, bytesRead);
+                    }
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "Ressource non trouvée : " + url);
+                }
+            } catch (IOException e) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erreur lors de la lecture de la ressource : " + url);
+            }
+            return;
         }
 
-        if (viewName != null) {
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/views/" + viewName);
-            dispatcher.forward(request, response);
-        } else {
-            response.setContentType("text/html;charset=UTF-8");
-            try (PrintWriter out = response.getWriter()) {
-                out.println("<h2>url inconnu pour cette url : " + url + "</h2>");
-            }
+        // 🔹 URL inconnue → 404
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<h2>URL inconnue pour cette URL : " + url + "</h2>");
         }
     }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
