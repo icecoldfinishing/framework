@@ -1,1 +1,1 @@
-D:\Framework\framework\src\main\java\etu\sprint\framework\FrontServlet.java
+D:\Framework\framework\src\main\java\etu\sprint\web\FrontController.java

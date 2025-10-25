@@ -1,4 +1,4 @@
-package etu.sprint.framework;
+package etu.sprint.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class FrontServlet extends HttpServlet {
+public class FrontController extends HttpServlet {
 
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -54,6 +54,6 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "FrontServlet for the custom framework.";
+        return "FrontController for the custom framework.";
     }
 }
