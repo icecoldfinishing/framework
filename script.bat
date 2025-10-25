@@ -82,11 +82,14 @@ echo framework.jar cree dans WEB-INF/lib.
 echo Compilation du projet de test...
 set "TEST_SOURCES_FILE=%BUILD_DIR%\test_sources.txt"
 dir /s /b "%TEST_PROJECT_DIR%\src\main\java\*.java" > "%TEST_SOURCES_FILE%"
-javac -d "%TEST_CLASSES_DIR%" -cp "%FRAMEWORK_JAR%;!FULL_CLASSPATH!" @"%TEST_SOURCES_FILE%"
-if %errorlevel% neq 0 (
-    echo Erreur lors de la compilation du projet de test.
-    pause
-    exit /b 1
+for %%A in ("%TEST_SOURCES_FILE%") do set "FileSize=%%~zA"
+if !FileSize! gtr 0 (
+    javac -d "%TEST_CLASSES_DIR%" -cp "%FRAMEWORK_JAR%;!FULL_CLASSPATH!" @"%TEST_SOURCES_FILE%"
+    if !errorlevel! neq 0 (
+        echo Erreur lors de la compilation du projet de test.
+        pause
+        exit /b 1
+    )
 )
 echo Projet de test compile.
 
