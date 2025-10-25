@@ -99,6 +99,21 @@ public class FrontController extends HttpServlet {
         
         String fullPath = "/views" + (path.startsWith("/") ? "" : "/") + path;
 
+
+        if (path.startsWith("/")) path = path.substring(1);
+        if (path.startsWith("views/")) path = path.substring("views/".length());
+        if (path.isEmpty()) path = "index.html";
+
+        if (!path.endsWith(".html") && !path.endsWith(".jsp")) {
+            if (fileExists(request, "/views/" + path + ".html")) {
+                path = path + ".html";
+            } else if (fileExists(request, "/views/" + path + ".jsp")) {
+                path = path + ".jsp";
+            }
+        }
+
+        String fullPath = "/views/" + path;
+
         if (fileExists(request, fullPath)) {
              if (path.endsWith(".jsp")) {
                 RequestDispatcher dispatcher = request.getRequestDispatcher(fullPath);
