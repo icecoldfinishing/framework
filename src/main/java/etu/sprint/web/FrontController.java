@@ -97,9 +97,6 @@ public class FrontController extends HttpServlet {
     private void handleFileRequest(HttpServletRequest request, HttpServletResponse response, String path)
             throws IOException, ServletException {
         
-        String fullPath = "/views" + (path.startsWith("/") ? "" : "/") + path;
-
-
         if (path.startsWith("/")) path = path.substring(1);
         if (path.startsWith("views/")) path = path.substring("views/".length());
         if (path.isEmpty()) path = "index.html";
