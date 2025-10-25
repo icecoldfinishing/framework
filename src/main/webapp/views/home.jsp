@@ -10,8 +10,8 @@
     <hr>
     <h3>Navigation</h3>
     <ul>
-        <li><a href="${pageContext.request.contextPath}/views/hello.jsp">Aller vers Hello.jsp</a></li>
-        <li><a href="${pageContext.request.contextPath}/views/a.html">Aller vers a.html</a></li>
+        <li><a href="${pageContext.request.contextPath}/hello">Aller vers Hello.jsp</a></li>
+        <li><a href="${pageContext.request.contextPath}/a">Aller vers a.html</a></li>
     </ul>
 </body>
 </html>

@@ -96,6 +96,7 @@ public class FrontController extends HttpServlet {
             throws IOException, ServletException {
 
         if (path.startsWith("/")) path = path.substring(1);
+        if (path.startsWith("views/")) path = path.substring("views/".length());
         if (path.isEmpty()) path = "index.html";
 
         if (!path.endsWith(".html") && !path.endsWith(".jsp")) {
