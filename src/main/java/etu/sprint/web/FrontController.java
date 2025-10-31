@@ -152,7 +152,8 @@ public class FrontController extends HttpServlet {
                 throw new ServletException("Error invoking controller for path " + path, e);
             }
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No route found for " + path);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().println("URL inconnu pour cette url: " + path);
         }
     }
 }
