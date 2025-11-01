@@ -54,19 +54,33 @@ public class FrontController extends HttpServlet {
         ControllerMethod controllerMethod = routeMap.get(path);
 
         if (controllerMethod != null) {
-            response.setContentType("text/plain;charset=UTF-8");
+            response.setContentType("text/html;charset=UTF-8");
             java.io.PrintWriter out = response.getWriter();
 
-            out.println("URL: " + path);
+            out.println("<!DOCTYPE html>");
+            out.println("<html lang=\"en\">");
+            out.println("<head>");
+            out.println("    <meta charset=\"UTF-8\">");
+            out.println("    <title>Controller Info</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("    <p>URL Path: " + path + "</p>");
+
             String controllerName = controllerMethod.controllerClass.getName();
             List<MethodInfo> methods = controllerInfo.get(controllerName);
 
-            out.println(controllerName);
+            out.println("    <p>Controller Class: " + controllerName + "</p>");
+
+            out.println("    <p>Methods:</p>");
             if (methods != null) {
                 for (MethodInfo methodInfo : methods) {
-                    out.println(methodInfo.getSignature());
+                    out.println("    <p>- " + methodInfo.getSignature() + "</p>");
                 }
+            } else {
+                out.println("    <p>No methods found for this controller.</p>");
             }
+            out.println("</body>");
+            out.println("</html>");
         } else {
             response.setContentType("text/plain;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
