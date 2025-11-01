@@ -21,8 +21,12 @@ public class FrontController extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
+            String controllerPackage = getServletConfig().getInitParameter("controller-package");
+            if (controllerPackage == null || controllerPackage.isEmpty()) {
+                throw new ServletException("Initialization parameter 'controller-package' is not set.");
+            }
             ClassScanner scanner = new ClassScanner();
-            scanner.scan("etu.sprint.controller");
+            scanner.scan(controllerPackage);
             this.routeMap = scanner.getRouteMap();
             this.controllerInfo = scanner.getControllerInfo();
         } catch (Exception e) {

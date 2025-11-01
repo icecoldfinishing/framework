@@ -8,6 +8,11 @@
         <servlet-name>FrontController</servlet-name>
         <servlet-class>etu.sprint.web.FrontController</servlet-class>
 
+        <init-param>
+            <param-name>controller-package</param-name>
+            <param-value>etu.sprint.controller</param-value>
+        </init-param>
+
         <load-on-startup>1</load-on-startup>
     </servlet>
 
