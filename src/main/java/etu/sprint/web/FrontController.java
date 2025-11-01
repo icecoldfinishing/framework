@@ -4,6 +4,10 @@ import java.util.*;
 import java.lang.reflect.Method;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import etu.sprint.annotation.AnnotationController;
 import etu.sprint.annotation.GetMethode;
@@ -17,20 +21,60 @@ public class FrontController extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-        // Manually list controller classes (can be automated later)
-        List<Class<?>> controllers = Arrays.asList(
-            etu.sprint.controller.TestController.class,
-            etu.sprint.controller.HelloController.class
-        );
+        try {
+            List<Class<?>> controllers = findControllers("etu.sprint.controller");
 
-        for (Class<?> controller : controllers) {
-            if (controller.isAnnotationPresent(AnnotationController.class)) {
-                AnnotationController ac = controller.getAnnotation(AnnotationController.class);
-                String prefix = ac.value();
-                routeMap.put(prefix, controller);
-                System.out.println("Mapped route: " + prefix + " -> " + controller.getName());
+            for (Class<?> controller : controllers) {
+                if (controller.isAnnotationPresent(AnnotationController.class)) {
+                    AnnotationController ac = controller.getAnnotation(AnnotationController.class);
+                    String prefix = ac.value();
+                    routeMap.put(prefix, controller);
+                    System.out.println("Mapped route: " + prefix + " -> " + controller.getName());
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new ServletException("Error initializing controllers", e);
+        }
+    }
+
+    private List<Class<?>> findControllers(String packageName) throws IOException, ClassNotFoundException {
+        List<Class<?>> controllers = new ArrayList<>();
+        String path = packageName.replace('.', '/');
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        if (classLoader == null) {
+            classLoader = FrontController.class.getClassLoader();
+        }
+        Enumeration<URL> resources = classLoader.getResources(path);
+
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            if (resource.getProtocol().equals("file")) {
+                File directory = new File(resource.getFile());
+                for (File file : directory.listFiles()) {
+                    if (file.getName().endsWith(".class")) {
+                        String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+                        Class<?> clazz = Class.forName(className);
+                        if (clazz.isAnnotationPresent(AnnotationController.class)) {
+                            controllers.add(clazz);
+                        }
+                    }
+                }
+            } else if (resource.getProtocol().equals("jar")) {
+                String jarPath = resource.getPath().substring(5, resource.getPath().indexOf("!"));
+                try (ZipInputStream zip = new ZipInputStream(new FileInputStream(jarPath))) {
+                    for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                        if (entry.getName().startsWith(path) && entry.getName().endsWith(".class")) {
+                            String className = entry.getName().replace('/', '.').substring(0, entry.getName().length() - 6);
+                            Class<?> clazz = Class.forName(className);
+                            if (clazz.isAnnotationPresent(AnnotationController.class)) {
+                                controllers.add(clazz);
+                            }
+                        }
+                    }
+                }
             }
         }
+        return controllers;
     }
 
     @Override
@@ -146,3 +190,4 @@ public class FrontController extends HttpServlet {
         }
     }
 }
+
