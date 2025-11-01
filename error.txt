@@ -1,15 +1,5 @@
-
-PS D:\Framework\framework> ./script.bat
-'D:\Progtool\apache-tomcat-10.1.28\webapps' n’est pas reconnu en tant que commande interne
-ou externe, un programme exécutable ou un fichier de commandes.
-Nettoyage des anciens builds...
-Nettoyage termine.
-Compilation du Framework...
-Framework compile.
-Creation du fichier framework.jar...
-framework.jar cree dans WEB-INF/lib.
-Compilation du projet de test...
-Fichier introuvable
-error: no source files
-Erreur lors de la compilation du projet de test.
-Appuyez sur une touche pour continuer... 
+ce que tu as fait la cest
+au debut de demarrage il y a code lance qui va scanner classpath
+qui a les controller et boucle les methodes annote a lurl?
+et tuignore si pas annote controller
+donc lobjectif est de savoir si url supporte et tu affiche ses methodes?

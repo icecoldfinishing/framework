@@ -7,16 +7,18 @@
     <servlet>
         <servlet-name>FrontController</servlet-name>
         <servlet-class>etu.sprint.web.FrontController</servlet-class>
+
         <init-param>
-            <param-name>routes-file</param-name>
-            <param-value>/WEB-INF/routes.xml</param-value>
+            <param-name>controller-package</param-name>
+            <param-value>etu.sprint.controller</param-value>
         </init-param>
+
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>FrontController</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
     <session-config>
