@@ -1,0 +1,5 @@
+ce que tu as fait la cest
+au debut de demarrage il y a code lance qui va scanner classpath
+qui a les controller et boucle les methodes annote a lurl?
+et tuignore si pas annote controller
+donc lobjectif est de savoir si url supporte et tu affiche ses methodes?
