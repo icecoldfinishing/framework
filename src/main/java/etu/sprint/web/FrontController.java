@@ -4,10 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import etu.sprint.annotation.AnnotationController;
 import etu.sprint.annotation.GetMethode;
@@ -26,48 +32,91 @@ public class FrontController extends HttpServlet {
     public void init() throws ServletException {
         super.init();
 
-        List<Class<?>> controllers = Arrays.asList(
-            etu.sprint.controller.TestController.class,
-            etu.sprint.controller.HelloController.class,
-            etu.sprint.controller.SprintController.class
-        );
+        try {
+            List<Class<?>> controllers = findControllers("etu.sprint.controller");
 
-        for (Class<?> controllerClass : controllers) {
-            if (controllerClass.isAnnotationPresent(AnnotationController.class)) {
-                AnnotationController ac = controllerClass.getAnnotation(AnnotationController.class);
-                String prefix = ac.value();
+            for (Class<?> controllerClass : controllers) {
+                if (controllerClass.isAnnotationPresent(AnnotationController.class)) {
+                    AnnotationController ac = controllerClass.getAnnotation(AnnotationController.class);
+                    String prefix = ac.value();
 
-                // Scan methods for @GetMethode
-                for (Method method : controllerClass.getDeclaredMethods()) {
-                    if (method.isAnnotationPresent(GetMethode.class)) {
-                        GetMethode gm = method.getAnnotation(GetMethode.class);
-                        String fullPath = prefix + gm.value();
-                        
-                        // Normalize path to remove trailing slash for consistent mapping
-                        String normalizedPath = fullPath.endsWith("/") && fullPath.length() > 1 ? fullPath.substring(0, fullPath.length() - 1) : fullPath;
+                    // Scan methods for @GetMethode
+                    for (Method method : controllerClass.getDeclaredMethods()) {
+                        if (method.isAnnotationPresent(GetMethode.class)) {
+                            GetMethode gm = method.getAnnotation(GetMethode.class);
+                            String fullPath = prefix + gm.value();
+                            
+                            // Normalize path to remove trailing slash for consistent mapping
+                            String normalizedPath = fullPath.endsWith("/") && fullPath.length() > 1 ? fullPath.substring(0, fullPath.length() - 1) : fullPath;
 
-                        Mapping mapping = new Mapping(controllerClass.getName(), method.getName());
-                        urlMappings.put(normalizedPath, mapping);
-                        System.out.println("Mapped URL: " + normalizedPath + " -> " + controllerClass.getSimpleName() + "." + method.getName() + "()");
+                            Mapping mapping = new Mapping(controllerClass.getName(), method.getName());
+                            urlMappings.put(normalizedPath, mapping);
+                            System.out.println("Mapped URL: " + normalizedPath + " -> " + controllerClass.getSimpleName() + "." + method.getName() + "()");
+                        }
+                    }
+                    // Check for a default handler method if no specific methods are annotated
+                    try {
+                        // Check for a method named "handle" as a fallback for the controller's base path
+                        Method handleMethod = controllerClass.getMethod("handle", HttpServletRequest.class, HttpServletResponse.class);
+                        Mapping mapping = new Mapping(controllerClass.getName(), handleMethod.getName());
+                        String normalizedPrefix = prefix.endsWith("/") && prefix.length() > 1 ? prefix.substring(0, prefix.length() - 1) : prefix;
+                        if (!urlMappings.containsKey(normalizedPrefix)) {
+                            urlMappings.put(normalizedPrefix, mapping);
+                            System.out.println("Mapped URL: " + normalizedPrefix + " -> " + controllerClass.getSimpleName() + "." + handleMethod.getName() + "()");
+                        }
+                    } catch (NoSuchMethodException e) {
+                        // No default "handle" method, which is fine.
                     }
                 }
-                 // Check for a default handler method if no specific methods are annotated
-                try {
-                    // Check for a method named "handle" as a fallback for the controller's base path
-                    Method handleMethod = controllerClass.getMethod("handle", HttpServletRequest.class, HttpServletResponse.class);
-                    Mapping mapping = new Mapping(controllerClass.getName(), handleMethod.getName());
-                    String normalizedPrefix = prefix.endsWith("/") && prefix.length() > 1 ? prefix.substring(0, prefix.length() - 1) : prefix;
-                    if (!urlMappings.containsKey(normalizedPrefix)) {
-                         urlMappings.put(normalizedPrefix, mapping);
-                         System.out.println("Mapped URL: " + normalizedPrefix + " -> " + controllerClass.getSimpleName() + "." + handleMethod.getName() + "()");
+            }
+            // Make the mappings available to other parts of the application (like SprintController)
+            getServletContext().setAttribute("urlMappings", urlMappings);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new ServletException("Error initializing controllers", e);
+        }
+    }
+
+    private List<Class<?>> findControllers(String packageName) throws IOException, ClassNotFoundException {
+        List<Class<?>> controllers = new ArrayList<>();
+        String path = packageName.replace('.', '/');
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        if (classLoader == null) {
+            classLoader = FrontController.class.getClassLoader();
+        }
+        Enumeration<URL> resources = classLoader.getResources(path);
+
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            if (resource.getProtocol().equals("file")) {
+                File directory = new File(resource.getFile());
+                File[] files = directory.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.getName().endsWith(".class")) {
+                            String className = packageName + '.' + file.getName().substring(0, file.getName().length() - 6);
+                            Class<?> clazz = Class.forName(className);
+                            if (clazz.isAnnotationPresent(AnnotationController.class)) {
+                                controllers.add(clazz);
+                            }
+                        }
                     }
-                } catch (NoSuchMethodException e) {
-                    // No default "handle" method, which is fine.
+                }
+            } else if (resource.getProtocol().equals("jar")) {
+                String jarPath = resource.getPath().substring(5, resource.getPath().indexOf("!"));
+                try (ZipInputStream zip = new ZipInputStream(new java.io.FileInputStream(jarPath))) {
+                    for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                        if (entry.getName().startsWith(path) && entry.getName().endsWith(".class")) {
+                            String className = entry.getName().replace('/', '.').substring(0, entry.getName().length() - 6);
+                            Class<?> clazz = Class.forName(className);
+                            if (clazz.isAnnotationPresent(AnnotationController.class)) {
+                                controllers.add(clazz);
+                            }
+                        }
+                    }
                 }
             }
         }
-        // Make the mappings available to other parts of the application (like SprintController)
-        getServletContext().setAttribute("urlMappings", urlMappings);
+        return controllers;
     }
 
     @Override
