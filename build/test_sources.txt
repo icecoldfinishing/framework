@@ -1,2 +1,0 @@
-D:\Framework\framework\test-project\src\main\java\etu\sprint\controller\HelloController.java
-D:\Framework\framework\test-project\src\main\java\etu\sprint\controller\TestController.java

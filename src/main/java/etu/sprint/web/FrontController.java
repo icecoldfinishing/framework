@@ -40,13 +40,6 @@ public class FrontController extends HttpServlet {
 
         String path = request.getRequestURI().substring(request.getContextPath().length());
 
-        if ("/framework-info".equals(path)) {
-            response.setContentType("text/html;charset=UTF-8");
-            request.setAttribute("controllerInfo", controllerInfo);
-            request.getRequestDispatcher("/views/framework-info.jsp").forward(request, response);
-            return;
-        }
-
         if (path.endsWith("/") && path.length() > 1) {
             path = path.substring(0, path.length() - 1);
         }

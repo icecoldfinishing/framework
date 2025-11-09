@@ -1,0 +1,18 @@
+Map doit etre en servlet context au lieu attribut fronServlet
+
+sprint4
+quant il existe class et methode annoter controller alors on lexecute et affiche 
+Dans controller , on test si la valeur de retour est en chaine de caractere apres execution
+Si chaine de caractere alors on recupere laffiche sur la page out.printWritter
+
+sprint4bis
+On cree dans framework : class ModelView et dedans on ajoute attribut view (en chaine de caractere)
+Donc dans controller on doit avoir methode qui return de type ModelView
+on associe a lurl et peut cree le ModelView
+Dans test-project
+Mv.setView(test.jsp)
+La valeur de return est conne lors invoke
+Donc qu on on test type valeur retour , si type ModelView on appelle getter mv, si type string on appelle orintWritter dans FrontController
+Mais dans test on fait les return string et ModelView
+Donc on utilise dispatcher pour l'afficher
+
