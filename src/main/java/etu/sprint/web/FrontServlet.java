@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class FrontController extends HttpServlet {
+public class FrontServlet extends HttpServlet {
 
     private Map<String, ControllerMethod> routeMap;
     private Map<String, List<MethodInfo>> controllerInfo;
@@ -30,7 +30,7 @@ public class FrontController extends HttpServlet {
             this.routeMap = scanner.getRouteMap();
             this.controllerInfo = scanner.getControllerInfo();
         } catch (Exception e) {
-            throw new ServletException("Failed to initialize FrontController", e);
+            throw new ServletException("Failed to initialize FrontServlet", e);
         }
     }
 
