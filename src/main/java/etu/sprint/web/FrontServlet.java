@@ -47,38 +47,23 @@ public class FrontServlet extends HttpServlet {
 
         ServletContext servletContext = getServletContext();
         Map<String, ControllerMethod> routeMap = (Map<String, ControllerMethod>) servletContext.getAttribute("routeMap");
-        Map<String, List<MethodInfo>> controllerInfo = (Map<String, List<MethodInfo>>) servletContext.getAttribute("controllerInfo");
 
         ControllerMethod controllerMethod = routeMap.get(path);
 
         if (controllerMethod != null) {
-            response.setContentType("text/html;charset=UTF-8");
-            java.io.PrintWriter out = response.getWriter();
+            try {
+                Object controllerInstance = controllerMethod.controllerClass.getDeclaredConstructor().newInstance();
+                Object returnValue = controllerMethod.method.invoke(controllerInstance);
 
-            out.println("<!DOCTYPE html>");
-            out.println("<html lang=\"en\">");
-            out.println("<head>");
-            out.println("    <meta charset=\"UTF-8\">");
-            out.println("    <title>Controller Info</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("    <p>URL Path: " + path + "</p>");
-
-            String controllerName = controllerMethod.controllerClass.getName();
-            List<MethodInfo> methods = controllerInfo.get(controllerName);
-
-            out.println("    <p>Controller Class: " + controllerName + "</p>");
-
-            out.println("    <p>Methods:</p>");
-            if (methods != null) {
-                for (MethodInfo methodInfo : methods) {
-                    out.println("    <p>- " + methodInfo.getSignature() + "</p>");
+                if (returnValue instanceof String) {
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().println(returnValue);
                 }
-            } else {
-                out.println("    <p>No methods found for this controller.</p>");
+                // D'autres types de retour (ex: ModelView) pourront être gérés ici
+                
+            } catch (Exception e) {
+                throw new ServletException("Erreur lors de l'execution de la methode du controleur", e);
             }
-            out.println("</body>");
-            out.println("</html>");
         } else {
             response.setContentType("text/plain;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
