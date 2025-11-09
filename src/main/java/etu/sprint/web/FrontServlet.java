@@ -3,6 +3,7 @@ package etu.sprint.web;
 import etu.sprint.model.ControllerMethod;
 import etu.sprint.model.MethodInfo;
 import etu.sprint.util.ClassScanner;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,9 +15,6 @@ import java.util.Map;
 
 public class FrontServlet extends HttpServlet {
 
-    private Map<String, ControllerMethod> routeMap;
-    private Map<String, List<MethodInfo>> controllerInfo;
-
     @Override
     public void init() throws ServletException {
         super.init();
@@ -27,8 +25,11 @@ public class FrontServlet extends HttpServlet {
             }
             ClassScanner scanner = new ClassScanner();
             scanner.scan(controllerPackage);
-            this.routeMap = scanner.getRouteMap();
-            this.controllerInfo = scanner.getControllerInfo();
+
+            ServletContext servletContext = getServletContext();
+            servletContext.setAttribute("routeMap", scanner.getRouteMap());
+            servletContext.setAttribute("controllerInfo", scanner.getControllerInfo());
+
         } catch (Exception e) {
             throw new ServletException("Failed to initialize FrontServlet", e);
         }
@@ -43,6 +44,10 @@ public class FrontServlet extends HttpServlet {
         if (path.endsWith("/") && path.length() > 1) {
             path = path.substring(0, path.length() - 1);
         }
+
+        ServletContext servletContext = getServletContext();
+        Map<String, ControllerMethod> routeMap = (Map<String, ControllerMethod>) servletContext.getAttribute("routeMap");
+        Map<String, List<MethodInfo>> controllerInfo = (Map<String, List<MethodInfo>>) servletContext.getAttribute("controllerInfo");
 
         ControllerMethod controllerMethod = routeMap.get(path);
 
