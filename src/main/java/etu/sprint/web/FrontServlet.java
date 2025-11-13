@@ -3,6 +3,8 @@ package etu.sprint.web;
 import etu.sprint.model.ControllerMethod;
 import etu.sprint.model.MethodInfo;
 import etu.sprint.util.ClassScanner;
+import etu.sprint.model.ModelView;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -58,8 +60,16 @@ public class FrontServlet extends HttpServlet {
                 if (returnValue instanceof String) {
                     response.setContentType("text/html;charset=UTF-8");
                     response.getWriter().println(returnValue);
+                } else if (returnValue instanceof ModelView) {
+                    ModelView mv = (ModelView) returnValue;
+                    
+                    for (Map.Entry<String, Object> entry : mv.getData().entrySet()) {
+                        request.setAttribute(entry.getKey(), entry.getValue());
+                    }
+
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(mv.getView());
+                    dispatcher.forward(request, response);
                 }
-                // D'autres types de retour (ex: ModelView) pourront être gérés ici
                 
             } catch (Exception e) {
                 throw new ServletException("Erreur lors de l'execution de la methode du controleur", e);
