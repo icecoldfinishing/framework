@@ -1,6 +1,6 @@
 package etu.sprint.handler;
 
-import etu.sprint.annotation.RequestParam;
+import etu.sprint.annotation.RequestParameter;
 import etu.sprint.model.ControllerMethod;
 import etu.sprint.model.ModelView;
 import etu.sprint.util.TypeConverter;
@@ -28,8 +28,8 @@ public class HandlerAdapter {
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
                 String paramName;
-                if (parameter.isAnnotationPresent(RequestParam.class)) {
-                    paramName = parameter.getAnnotation(RequestParam.class).value();
+                if (parameter.isAnnotationPresent(RequestParameter.class)) {
+                    paramName = parameter.getAnnotation(RequestParameter.class).value();
                 } else {
                     paramName = parameter.getName();
                 }
