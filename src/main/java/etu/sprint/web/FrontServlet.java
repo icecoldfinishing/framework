@@ -1,9 +1,8 @@
 package etu.sprint.web;
 
 import etu.sprint.model.ControllerMethod;
-import etu.sprint.model.MethodInfo;
-import etu.sprint.util.ClassScanner;
 import etu.sprint.model.ModelView;
+import etu.sprint.util.ClassScanner;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -12,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public class FrontServlet extends HttpServlet {
@@ -37,6 +35,25 @@ public class FrontServlet extends HttpServlet {
         }
     }
 
+    private boolean matchUrl(String requestPath, String routePattern) {
+        String[] requestParts = requestPath.split("/");
+        String[] routeParts = routePattern.split("/");
+
+        if (requestParts.length != routeParts.length) {
+            return false;
+        }
+
+        for (int i = 0; i < routeParts.length; i++) {
+            String routePart = routeParts[i];
+            String requestPart = requestParts[i];
+
+            if (!routePart.startsWith("{") && !routePart.endsWith("}") && !routePart.equals(requestPart)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -50,7 +67,14 @@ public class FrontServlet extends HttpServlet {
         ServletContext servletContext = getServletContext();
         Map<String, ControllerMethod> routeMap = (Map<String, ControllerMethod>) servletContext.getAttribute("routeMap");
 
-        ControllerMethod controllerMethod = routeMap.get(path);
+        ControllerMethod controllerMethod = null;
+
+        for (Map.Entry<String, ControllerMethod> entry : routeMap.entrySet()) {
+            if (matchUrl(path, entry.getKey())) {
+                controllerMethod = entry.getValue();
+                break;
+            }
+        }
 
         if (controllerMethod != null) {
             try {
@@ -62,7 +86,7 @@ public class FrontServlet extends HttpServlet {
                     response.getWriter().println(returnValue);
                 } else if (returnValue instanceof ModelView) {
                     ModelView mv = (ModelView) returnValue;
-                    
+
                     for (Map.Entry<String, Object> entry : mv.getData().entrySet()) {
                         request.setAttribute(entry.getKey(), entry.getValue());
                     }
@@ -70,7 +94,7 @@ public class FrontServlet extends HttpServlet {
                     RequestDispatcher dispatcher = request.getRequestDispatcher(mv.getView());
                     dispatcher.forward(request, response);
                 }
-                
+
             } catch (Exception e) {
                 throw new ServletException("Erreur lors de l'execution de la methode du controleur", e);
             }
