@@ -1,67 +1,47 @@
-SPRINT 6 – Gestion avancée des URLs dynamiques et injection de paramètres
+SPRINT 6 TIER – Gestion professionnelle avec REGEX (le vrai REST)
+Idée principale :
+Cette étape introduit la VRAIE logique REST professionnelle.
 
-Objectif :
-Permettre au framework de gérer automatiquement les valeurs présentes dans les URLs du type /etudiant/{id} et d’injecter les valeurs dans les paramètres des méthodes du contrôleur, sans que le développeur ait besoin d’utiliser RequestParam à chaque fois.
+Ce que fait Sprint 6 tier :
 
-Contexte :
-Dans Sprint3Bis, on a appris à détecter les accolades {} et à récupérer les valeurs dynamiques dans l’URL.
+transforme l’URL annotée en REGEX
+
+compare la requête réelle grâce au regex
+
+extrait les groupes capturés
+
+stocke les noms + valeurs
+
+injecte les valeurs dans la méthode
+
 Exemple :
-URL : /etudiant/10
-Mapping : /etudiant/{id}
-Le framework est capable d’extraire id = 10
-Mais jusqu’ici, on ne faisait que matcher l’URL. Maintenant, on doit injecter la valeur dans la méthode appelée.
+Annotation : /etudiant/{id}
+devient regex : ^/etudiant/([A-Za-z0-9]+)$
 
-Sprint 6 : Fonctionnement détaillé
+Grâce à ça :
+/etudiant/19 match
+/etudiant/abc match
+/etudiant/19/test ne match plus → bon comportement REST
 
-Détection d’une URL avec variable dynamique
-Chaque fois qu’une URL reçue contient une portion entre {}, par exemple {id}, le framework reconnaît que c’est une variable dynamique.
+Sprint 6 tier apporte :
 
-Recherche de la méthode correspondante
-On compare avec les mappings d’annotation dans le contrôleur :
-Exemple :
-@GetMapping("/etudiant/{id}")
-public String findEtudiant(int id)
+matching fiable
 
-Injection automatique selon la signature de la méthode :
-Cas 1 : le nom du paramètre de la méthode est le même que le nom dans les {}
-Exemple :
-URL = /etudiant/10
-Méthode = findEtudiant(int id)
-Variable détectée = id
-=> On injecte id = 10 directement dans la méthode
+respect de la structure exacte de l’URL
 
-Cas 2 : le nom du paramètre est différent
-Exemple :
-@GetMapping("/etudiant/{id}")
-public String findEtudiant(int code)
-Variable URL = id
-Nom paramètre = code
-=> On ne peut pas faire correspondre
-=> Le framework met null ou une valeur par défaut
-Exception : si @RequestParam("id") existe, alors id est utilisé pour remplir code
+extraction garantie des valeurs
 
-Cas 3 : présence de @RequestParam
-Exemple :
-public String findEtudiant(@RequestParam("id") int code)
-Même si le nom du paramètre ne correspond pas à {id}
-Le framework lit l’annotation et injecte la bonne valeur
+fonctionnement identique à Spring MVC
 
-Comportement résumé :
-Si la méthode a un paramètre
+C’est là que le framework devient vraiment PRO.
 
-si le nom correspond exactement au nom des {} --> injecte directement
+Résumé final de la différence
 
-si le nom est différent mais annoté avec RequestParam --> injecte en utilisant la variable
+Sprint 6 :
+On détecte les {} mais simple, pas de regex.
 
-sinon --> met null (ou valeur par défaut selon type)
+Sprint 6 bis :
+Gestion avancée des paramètres (plusieurs {}, @RequestParam, mélanges).
 
-Conclusion
-Sprint 6 rend le framework plus intelligent :
-
-il peut utiliser les paramètres dans l’URL sans besoin de RequestParam
-
-il est capable de déduire automatiquement les valeurs
-
-il fonctionne comme Spring MVC
-
-il améliore la compatibilité entre mapping dynamique et injection automatique
+Sprint 6 tier :
+VÉRITABLE matching d'URL avec REGEX + extraction professionnelle des valeurs.

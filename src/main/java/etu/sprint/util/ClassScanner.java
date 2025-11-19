@@ -4,6 +4,7 @@ import etu.sprint.annotation.AnnotationController;
 import etu.sprint.annotation.GetMethode;
 import etu.sprint.model.ControllerMethod;
 import etu.sprint.model.MethodInfo;
+import etu.sprint.model.Route;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -23,11 +24,11 @@ import java.util.jar.JarFile;
 
 public class ClassScanner {
 
-    private final Map<String, ControllerMethod> routeMap = new HashMap<>();
+    private final List<Route> routes = new ArrayList<>();
     private final Map<String, List<MethodInfo>> controllerInfo = new HashMap<>();
 
-    public Map<String, ControllerMethod> getRouteMap() {
-        return routeMap;
+    public List<Route> getRoutes() {
+        return routes;
     }
 
     public Map<String, List<MethodInfo>> getControllerInfo() {
@@ -103,8 +104,8 @@ public class ClassScanner {
                         if (fullPath.endsWith("/") && fullPath.length() > 1) {
                             fullPath = fullPath.substring(0, fullPath.length() - 1);
                         }
-
-                        routeMap.put(fullPath, new ControllerMethod(clazz, method));
+                        
+                        routes.add(new Route(fullPath, new ControllerMethod(clazz, method)));
                     }
                 }
 
@@ -115,7 +116,7 @@ public class ClassScanner {
                         if (normalizedPrefix.endsWith("/") && normalizedPrefix.length() > 1) {
                             normalizedPrefix = normalizedPrefix.substring(0, normalizedPrefix.length() - 1);
                         }
-                        routeMap.put(normalizedPrefix, new ControllerMethod(clazz, handleMethod));
+                        routes.add(new Route(normalizedPrefix, new ControllerMethod(clazz, handleMethod)));
                     } catch (NoSuchMethodException e) {
                         // No handle method
                     }
