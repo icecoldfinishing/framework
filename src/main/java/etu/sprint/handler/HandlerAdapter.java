@@ -1,6 +1,5 @@
 package etu.sprint.handler;
 
-import etu.sprint.annotation.RequestParameter;
 import etu.sprint.model.ControllerMethod;
 import etu.sprint.model.ModelView;
 import etu.sprint.util.TypeConverter;
@@ -15,6 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
+
 public class HandlerAdapter {
 
     public void handle(HttpServletRequest request, HttpServletResponse response, ControllerMethod controllerMethod,
@@ -28,11 +28,7 @@ public class HandlerAdapter {
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
                 String paramName;
-                if (parameter.isAnnotationPresent(RequestParameter.class)) {
-                    paramName = parameter.getAnnotation(RequestParameter.class).value();
-                } else {
-                    paramName = parameter.getName();
-                }
+                paramName = parameter.getName();
 
                 String paramValue = pathVariables.get(paramName);
                 args[i] = TypeConverter.convertStringValue(paramValue, parameter.getType());
