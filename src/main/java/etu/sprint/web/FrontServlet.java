@@ -1,9 +1,9 @@
 package etu.sprint.web;
 
+import etu.sprint.handler.HandlerAdapter;
 import etu.sprint.model.ControllerMethod;
-import etu.sprint.model.ModelView;
 import etu.sprint.util.ClassScanner;
-import jakarta.servlet.RequestDispatcher;
+import etu.sprint.util.UrlUtil;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.Map;
 
 public class FrontServlet extends HttpServlet {
+
+    private HandlerAdapter handlerAdapter;
 
     @Override
     public void init() throws ServletException {
@@ -30,28 +32,11 @@ public class FrontServlet extends HttpServlet {
             servletContext.setAttribute("routeMap", scanner.getRouteMap());
             servletContext.setAttribute("controllerInfo", scanner.getControllerInfo());
 
+            this.handlerAdapter = new HandlerAdapter();
+
         } catch (Exception e) {
             throw new ServletException("Failed to initialize FrontServlet", e);
         }
-    }
-
-    private boolean matchUrl(String requestPath, String routePattern) {
-        String[] requestParts = requestPath.split("/");
-        String[] routeParts = routePattern.split("/");
-
-        if (requestParts.length != routeParts.length) {
-            return false;
-        }
-
-        for (int i = 0; i < routeParts.length; i++) {
-            String routePart = routeParts[i];
-            String requestPart = requestParts[i];
-
-            if (!routePart.startsWith("{") && !routePart.endsWith("}") && !routePart.equals(requestPart)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
@@ -68,9 +53,11 @@ public class FrontServlet extends HttpServlet {
         Map<String, ControllerMethod> routeMap = (Map<String, ControllerMethod>) servletContext.getAttribute("routeMap");
 
         ControllerMethod controllerMethod = null;
+        Map<String, String> pathVariables = null;
 
         for (Map.Entry<String, ControllerMethod> entry : routeMap.entrySet()) {
-            if (matchUrl(path, entry.getKey())) {
+            pathVariables = UrlUtil.extractPathVariables(path, entry.getKey());
+            if (pathVariables != null) {
                 controllerMethod = entry.getValue();
                 break;
             }
@@ -78,23 +65,7 @@ public class FrontServlet extends HttpServlet {
 
         if (controllerMethod != null) {
             try {
-                Object controllerInstance = controllerMethod.controllerClass.getDeclaredConstructor().newInstance();
-                Object returnValue = controllerMethod.method.invoke(controllerInstance);
-
-                if (returnValue instanceof String) {
-                    response.setContentType("text/html;charset=UTF-8");
-                    response.getWriter().println(returnValue);
-                } else if (returnValue instanceof ModelView) {
-                    ModelView mv = (ModelView) returnValue;
-
-                    for (Map.Entry<String, Object> entry : mv.getData().entrySet()) {
-                        request.setAttribute(entry.getKey(), entry.getValue());
-                    }
-
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(mv.getView());
-                    dispatcher.forward(request, response);
-                }
-
+                handlerAdapter.handle(request, response, controllerMethod, pathVariables);
             } catch (Exception e) {
                 throw new ServletException("Erreur lors de l'execution de la methode du controleur", e);
             }

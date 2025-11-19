@@ -50,7 +50,7 @@ echo Nettoyage termine.
 echo Compilation du Framework...
 set "FRAMEWORK_SOURCES_FILE=%BUILD_DIR%\framework_sources.txt"
 dir /s /b "%FRAMEWORK_DIR%\src\main\java\*.java" > "%FRAMEWORK_SOURCES_FILE%"
-javac -d "%FRAMEWORK_CLASSES_DIR%" -cp "!FULL_CLASSPATH!" @"%FRAMEWORK_SOURCES_FILE%"
+javac -d "%FRAMEWORK_CLASSES_DIR%" -cp "!FULL_CLASSPATH!" -parameters @"%FRAMEWORK_SOURCES_FILE%"
 if %errorlevel% neq 0 (
     echo Erreur lors de la compilation du framework.
     pause
