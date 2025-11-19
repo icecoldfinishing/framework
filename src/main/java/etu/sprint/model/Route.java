@@ -7,12 +7,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Route {
-    private final ControllerMethod controllerMethod;
-    private final Pattern pattern;
-    private final List<String> paramNames = new ArrayList<>();
 
-    // Pattern pour trouver les variables de chemin comme {id}
+public class Route {
+    private final ControllerMethod controllerMethod; //contient l’instance du controller + la méthode à exécuter.
+    private final Pattern pattern; //REGEX compilé servant à reconnaître l’URL réelle.
+    private final List<String> paramNames = new ArrayList<>(); //liste des noms de variables trouvés dans { } (ex: ["id"]).
+
+    // Pattern pour trouver les variables de chemin entre { }
     private static final Pattern PARAM_PATTERN = Pattern.compile("\\{([^}]+)\\}");
 
     public Route(String path, ControllerMethod controllerMethod) {
@@ -22,7 +23,7 @@ public class Route {
 
     private Pattern compilePattern(String path) {
         StringBuilder regex = new StringBuilder("^");
-        Matcher matcher = PARAM_PATTERN.matcher(path);
+        Matcher matcher = PARAM_PATTERN.matcher(path);  //outil pour trouver les {param}.
         int lastIndex = 0;
 
         while (matcher.find()) {
@@ -41,17 +42,18 @@ public class Route {
         
         // Ajoute la partie restante du chemin après le dernier paramètre
         regex.append(Pattern.quote(path.substring(lastIndex)));
-        regex.append("$");
+        regex.append("$"); //garantit un match exact.
         
-        return Pattern.compile(regex.toString());
+        return Pattern.compile(regex.toString()); //Compile en Pattern Java
     }
 
     public ControllerMethod getControllerMethod() {
-        return controllerMethod;
+        return controllerMethod; // Permet au FrontServlet de récupérer l’objet controller + la méthode.
     }
 
     public Map<String, String> match(String requestPath) {
         Matcher matcher = pattern.matcher(requestPath);
+        //vérifier si ce chemin correspond à la route
         if (matcher.matches()) {
             Map<String, String> pathVariables = new HashMap<>();
             for (int i = 0; i < paramNames.size(); i++) {
