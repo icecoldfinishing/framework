@@ -24,3 +24,6 @@ Support des routes REST comme /etudiant/{id}. Extraction automatique du paramèt
 
 SPRINT 6bis (paramètres avancés)
 Gestion de {} sans request.getParameter(). Mapping automatique d’arguments par nom ou annotation. @RequestParam prioritaire.
+
+SPRINT 6tier
+On prend le id via navigateur si meme nom le variable et sur l url donc on doit faire un petit regex pour cette gestion

@@ -2,8 +2,8 @@ package etu.sprint.web;
 
 import etu.sprint.handler.HandlerAdapter;
 import etu.sprint.model.ControllerMethod;
+import etu.sprint.model.Route;
 import etu.sprint.util.ClassScanner;
-import etu.sprint.util.UrlUtil;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -11,11 +11,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class FrontServlet extends HttpServlet {
 
     private HandlerAdapter handlerAdapter;
+    private List<Route> routes;
 
     @Override
     public void init() throws ServletException {
@@ -28,8 +30,11 @@ public class FrontServlet extends HttpServlet {
             ClassScanner scanner = new ClassScanner();
             scanner.scan(controllerPackage);
 
+            // Stocke la liste des routes
+            this.routes = scanner.getRoutes(); 
+            
+            // Garde les informations du contrôleur pour d'éventuels besoins de débogage ou d'introspection
             ServletContext servletContext = getServletContext();
-            servletContext.setAttribute("routeMap", scanner.getRouteMap());
             servletContext.setAttribute("controllerInfo", scanner.getControllerInfo());
 
             this.handlerAdapter = new HandlerAdapter();
@@ -49,16 +54,14 @@ public class FrontServlet extends HttpServlet {
             path = path.substring(0, path.length() - 1);
         }
 
-        ServletContext servletContext = getServletContext();
-        Map<String, ControllerMethod> routeMap = (Map<String, ControllerMethod>) servletContext.getAttribute("routeMap");
-
         ControllerMethod controllerMethod = null;
         Map<String, String> pathVariables = null;
 
-        for (Map.Entry<String, ControllerMethod> entry : routeMap.entrySet()) {
-            pathVariables = UrlUtil.extractPathVariables(path, entry.getKey());
+        // Itère sur les routes et utilise le matching REGEX
+        for (Route route : this.routes) {
+            pathVariables = route.match(path);
             if (pathVariables != null) {
-                controllerMethod = entry.getValue();
+                controllerMethod = route.getControllerMethod();
                 break;
             }
         }
@@ -67,6 +70,8 @@ public class FrontServlet extends HttpServlet {
             try {
                 handlerAdapter.handle(request, response, controllerMethod, pathVariables);
             } catch (Exception e) {
+                // Log l'erreur pour un meilleur débogage
+                e.printStackTrace(); 
                 throw new ServletException("Erreur lors de l'execution de la methode du controleur", e);
             }
         } else {
