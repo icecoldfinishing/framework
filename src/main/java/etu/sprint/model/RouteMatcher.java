@@ -7,17 +7,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-public class Route {
-    private final ControllerMethod controllerMethod; //contient l’instance du controller + la méthode à exécuter.
+public class RouteMatcher {
     private final Pattern pattern; //REGEX compilé servant à reconnaître l’URL réelle.
     private final List<String> paramNames = new ArrayList<>(); //liste des noms de variables trouvés dans { } (ex: ["id"]).
 
     // Pattern pour trouver les variables de chemin entre { }
     private static final Pattern PARAM_PATTERN = Pattern.compile("\\{([^}]+)\\}");
 
-    public Route(String path, ControllerMethod controllerMethod) {
-        this.controllerMethod = controllerMethod;
+    public RouteMatcher(String path) {
         this.pattern = compilePattern(path);
     }
 
@@ -45,10 +42,6 @@ public class Route {
         regex.append("$"); //garantit un match exact.
         
         return Pattern.compile(regex.toString()); //Compile en Pattern Java
-    }
-
-    public ControllerMethod getControllerMethod() {
-        return controllerMethod; // Permet au FrontServlet de récupérer l’objet controller + la méthode.
     }
 
     public Map<String, String> match(String requestPath) {
