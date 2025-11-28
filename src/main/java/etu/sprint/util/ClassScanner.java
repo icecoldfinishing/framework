@@ -99,11 +99,7 @@ public class ClassScanner {
                     if (method.isAnnotationPresent(GetMethode.class)) {
                         methodAnnotated = true;
                         GetMethode gm = method.getAnnotation(GetMethode.class);
-                        String fullPath = prefix + gm.value();
-
-                        if (fullPath.endsWith("/") && fullPath.length() > 1) {
-                            fullPath = fullPath.substring(0, fullPath.length() - 1);
-                        }
+                        String fullPath = normalizePath(prefix + "/" + gm.value());
                         
                         routes.add(new Route(fullPath, new ControllerMethod(clazz, method)));
                     }
@@ -112,10 +108,7 @@ public class ClassScanner {
                 if (!methodAnnotated) {
                     try {
                         Method handleMethod = clazz.getMethod("handle", HttpServletRequest.class, HttpServletResponse.class);
-                        String normalizedPrefix = prefix;
-                        if (normalizedPrefix.endsWith("/") && normalizedPrefix.length() > 1) {
-                            normalizedPrefix = normalizedPrefix.substring(0, normalizedPrefix.length() - 1);
-                        }
+                        String normalizedPrefix = normalizePath(prefix);
                         routes.add(new Route(normalizedPrefix, new ControllerMethod(clazz, handleMethod)));
                     } catch (NoSuchMethodException e) {
                         // No handle method
@@ -125,5 +118,17 @@ public class ClassScanner {
         } catch (ClassNotFoundException | NoClassDefFoundError e) {
             System.err.println("Could not process class: " + className + " " + e.getMessage());
         }
+    }
+
+    private String normalizePath(String path) {
+        if (path.isEmpty()) return "/";
+        String normalized = path.replaceAll("//+", "/"); // Replace multiple slashes with a single one
+        if (normalized.length() > 1 && normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        if (!normalized.startsWith("/")) {
+            normalized = "/" + normalized;
+        }
+        return normalized;
     }
 }
