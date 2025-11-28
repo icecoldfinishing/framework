@@ -27,3 +27,26 @@ Gestion de {} sans request.getParameter(). Mapping automatique d’arguments par
 
 SPRINT 6tier
 On prend le id via navigateur si meme nom le variable et sur l url donc on doit faire un petit regex pour cette gestion
+
+Sprint7
+Sprint 7 — Reformulation claire et complète
+
+Objectif principal :
+Gérer et différencier les méthodes HTTP (GET, POST, PUT, DELETE, PATCH, etc.) pour une même URL. Permettre d’associer plusieurs handlers à la même route selon la méthode HTTP et dispatcher correctement (200, 404, 405, etc.).
+
+Sprint8
+suite sprint6
+c'est a dire traite les donne depuis vue vers son controller
+donc si il y a map type string cle et string valeur
+si cote developpeur il y a de type map de type string
+donc en frontservlet si il y a map on le fiat plus en string lors invoke mais new map qui boucle  getValues et on fait addValues
+Dans contoller par exemple
+public modelView(Map<String string>)
+par exemple il y a formulaire postMapping save
+mais le frontServlet sait que save de cette controller qui est invoke
+alors elle verifie largument du methode et si il y a map<String , string>
+on boucle le table et on obtient les valeurs
+les values sont key
+et on cree new hasmap pour remplir les donne pour  chaque ligne
+donc ce sont les data dans request qui sont dedans au lieu de request . sans cast mais copie seulement
+non on va  faire value object pas string donc string object et on test checkbox

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -25,12 +26,20 @@ public class HandlerAdapter {
             Parameter[] parameters = method.getParameters();
             Object[] args = new Object[parameters.length];
 
+            // Combine path variables and request parameters (from query string or form body)
+            Map<String, String> allParameters = new HashMap<>(pathVariables);
+            request.getParameterMap().forEach((key, values) -> {
+                if (values != null && values.length > 0) {
+                    allParameters.putIfAbsent(key, values[0]); // Prioritize path variables if name collision
+                }
+            });
+
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
                 String paramName;
                 paramName = parameter.getName();
 
-                String paramValue = pathVariables.get(paramName);
+                String paramValue = allParameters.get(paramName);
                 args[i] = TypeConverter.convertStringValue(paramValue, parameter.getType());
             }
 
