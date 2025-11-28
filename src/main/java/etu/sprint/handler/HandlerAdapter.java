@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 
 public class HandlerAdapter {
@@ -47,14 +48,29 @@ public class HandlerAdapter {
                     if (paramValue == null) { // If not found in path variables, try request parameters
                         paramValue = allParameters.get(paramName);
                     }
+                    args[i] = TypeConverter.convertStringValue(paramValue, parameter.getType());
+                } else if (parameter.getType() == Map.class) {
+                    // Handle Map<String, Object> parameter
+                    Map<String, Object> dataMap = new HashMap<>();
+                    // Add path variables
+                    pathVariables.forEach(dataMap::put);
+                    // Add request parameters
+                    request.getParameterMap().forEach((key, values) -> {
+                        if (values.length == 1) {
+                            dataMap.put(key, values[0]);
+                        } else {
+                            dataMap.put(key, Arrays.asList(values)); // Handle multiple values for checkboxes
+                        }
+                    });
+                    args[i] = dataMap;
                 } else {
                     paramName = parameter.getName();
                     paramValue = pathVariables.get(paramName); // Try to get from path variables first by name
                     if (paramValue == null) { // If not found in path variables, try request parameters
                         paramValue = allParameters.get(paramName);
                     }
+                    args[i] = TypeConverter.convertStringValue(paramValue, parameter.getType());
                 }
-                args[i] = TypeConverter.convertStringValue(paramValue, parameter.getType());
             }
 
             Object returnValue = method.invoke(controllerInstance, args);
