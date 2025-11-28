@@ -37,3 +37,15 @@ Gérer et différencier les méthodes HTTP (GET, POST, PUT, DELETE, PATCH, etc.)
 Sprint8
 suite sprint6
 c'est a dire traite les donne depuis vue vers son controller
+donc si il y a map type string cle et string valeur
+si cote developpeur il y a de type map de type string
+donc en frontservlet si il y a map on le fiat plus en string lors invoke mais new map qui boucle  getValues et on fait addValues
+Dans contoller par exemple
+public modelView(Map<String string>)
+par exemple il y a formulaire postMapping save
+mais le frontServlet sait que save de cette controller qui est invoke
+alors elle verifie largument du methode et si il y a map<String , string>
+on boucle le table et on obtient les valeurs
+les values sont key
+et on cree new hasmap pour remplir les donne pour  chaque ligne
+donc ce sont les data dans request qui sont dedans au lieu de request
