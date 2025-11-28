@@ -35,18 +35,15 @@ Objectif principal :
 Gérer et différencier les méthodes HTTP (GET, POST, PUT, DELETE, PATCH, etc.) pour une même URL. Permettre d’associer plusieurs handlers à la même route selon la méthode HTTP et dispatcher correctement (200, 404, 405, etc.).
 
 Sprint8
-suite sprint6
-c'est a dire traite les donne depuis vue vers son controller
-donc si il y a map type string cle et string valeur
-si cote developpeur il y a de type map de type string
-donc en frontservlet si il y a map on le fiat plus en string lors invoke mais new map qui boucle  getValues et on fait addValues
-Dans contoller par exemple
-public modelView(Map<String string>)
-par exemple il y a formulaire postMapping save
-mais le frontServlet sait que save de cette controller qui est invoke
-alors elle verifie largument du methode et si il y a map<String , string>
-on boucle le table et on obtient les valeurs
-les values sont key
-et on cree new hasmap pour remplir les donne pour  chaque ligne
-donc ce sont les data dans request qui sont dedans au lieu de request . sans cast mais copie seulement
-non on va  faire value object pas string donc string object et on test checkbox
+Objectif :
+Poursuivre le développement du Sprint 6 en traitant les données envoyées depuis la vue vers le contrôleur.
+Détails :
+    Si le contrôleur reçoit une carte de type Map<String, Object>, le FrontServlet doit gérer cette carte plutôt que des chaînes de caractères lors de l'invocation de la méthode.
+    Lorsqu'une Map est détectée dans le FrontServlet, une nouvelle carte est créée en boucle via getValues() pour ajouter les valeurs.
+    Par exemple, dans le contrôleur, nous aurons une méthode définie comme :
+    public ModelView(Map<String, Object> data)
+Si nous avons un formulaire avec une méthode annotée @PostMapping (comme save), le FrontServlet identifie que c’est cette méthode qui est à invoquer.
+Il vérifie ensuite les paramètres de la méthode : si une Map<String, Object> est présente, il boucle à travers les entrées de la carte pour récupérer les valeurs.
+Les valeurs sont considérées comme des clés, et une nouvelle HashMap est créée pour remplir les données correspondantes pour chaque ligne.
+Les données de la requête sont ainsi transférées dans cette nouvelle carte, sans avoir besoin de caster, mais en les copiant simplement.
+Nous nous orientons vers l'utilisation de Value Objects au lieu de simples chaînes de caractères afin de permettre le traitement des checkboxes et d'autres formats de données.
