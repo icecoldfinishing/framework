@@ -48,4 +48,4 @@ alors elle verifie largument du methode et si il y a map<String , string>
 on boucle le table et on obtient les valeurs
 les values sont key
 et on cree new hasmap pour remplir les donne pour  chaque ligne
-donc ce sont les data dans request qui sont dedans au lieu de request
+donc ce sont les data dans request qui sont dedans au lieu de request . sans cast mais copie seulement
