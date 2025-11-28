@@ -37,9 +37,23 @@ public class HandlerAdapter {
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
                 String paramName;
-                paramName = parameter.getName();
+                String paramValue = null;
 
-                String paramValue = allParameters.get(paramName);
+                // Check for @RequestParameter annotation
+                if (parameter.isAnnotationPresent(etu.sprint.annotation.RequestParameter.class)) {
+                    etu.sprint.annotation.RequestParameter rp = parameter.getAnnotation(etu.sprint.annotation.RequestParameter.class);
+                    paramName = rp.value();
+                    paramValue = pathVariables.get(paramName); // Try to get from path variables first
+                    if (paramValue == null) { // If not found in path variables, try request parameters
+                        paramValue = allParameters.get(paramName);
+                    }
+                } else {
+                    paramName = parameter.getName();
+                    paramValue = pathVariables.get(paramName); // Try to get from path variables first by name
+                    if (paramValue == null) { // If not found in path variables, try request parameters
+                        paramValue = allParameters.get(paramName);
+                    }
+                }
                 args[i] = TypeConverter.convertStringValue(paramValue, parameter.getType());
             }
 
