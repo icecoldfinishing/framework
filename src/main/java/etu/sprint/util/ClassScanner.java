@@ -138,7 +138,7 @@ public class ClassScanner {
                     }
 
                     if (path != null && httpMethods != null) {
-                        String fullPath = normalizePath(controllerPrefix + path);
+                        String fullPath = normalizePath(controllerPrefix + "/" + path);
                         ControllerMethod controllerMethod = new ControllerMethod(clazz, method);
 
                         for (HttpMethod httpMethod : httpMethods) {
