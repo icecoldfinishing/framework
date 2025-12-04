@@ -32,7 +32,7 @@ Sprint 7
 Objectif principal :
 Gérer et différencier les méthodes HTTP (GET, POST, PUT, DELETE, PATCH, etc.) pour une même URL. Permettre d’associer plusieurs handlers à la même route selon la méthode HTTP et dispatcher correctement (200, 404, 405, etc.).
 
-Sprint8
+Sprint 8
 Objectif :
 Poursuivre le développement du Sprint 6 en traitant les données envoyées depuis la vue vers le contrôleur.
 Détails :
@@ -47,4 +47,4 @@ Les données de la requête sont ainsi transférées dans cette nouvelle carte, 
 Nous nous orientons vers l'utilisation de Value Objects au lieu de simples chaînes de caractères afin de permettre le traitement des checkboxes et d'autres formats de données.
 
 Sprint 8bis
-Mtn
+Mtn pour le sprint 8 bis par exemple au lieu de save employe on ne save plus via hashmap mais Object Employe directement au lieu de dataMap
