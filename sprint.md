@@ -28,9 +28,7 @@ Gestion de {} sans request.getParameter(). Mapping automatique d’arguments par
 SPRINT 6tier
 On prend le id via navigateur si meme nom le variable et sur l url donc on doit faire un petit regex pour cette gestion
 
-Sprint7
-Sprint 7 — Reformulation claire et complète
-
+Sprint 7
 Objectif principal :
 Gérer et différencier les méthodes HTTP (GET, POST, PUT, DELETE, PATCH, etc.) pour une même URL. Permettre d’associer plusieurs handlers à la même route selon la méthode HTTP et dispatcher correctement (200, 404, 405, etc.).
 
@@ -47,3 +45,6 @@ Il vérifie ensuite les paramètres de la méthode : si une Map<String, Object> 
 Les valeurs sont considérées comme des clés, et une nouvelle HashMap est créée pour remplir les données correspondantes pour chaque ligne.
 Les données de la requête sont ainsi transférées dans cette nouvelle carte, sans avoir besoin de caster, mais en les copiant simplement.
 Nous nous orientons vers l'utilisation de Value Objects au lieu de simples chaînes de caractères afin de permettre le traitement des checkboxes et d'autres formats de données.
+
+Sprint 8bis
+Mtn
