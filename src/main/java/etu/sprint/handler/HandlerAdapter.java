@@ -18,9 +18,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 
-import java.io.IOException;
+import etu.sprint.annotation.RestAPI;
+import etu.sprint.model.JsonResponse;
+import etu.sprint.util.JsonConverter;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
+
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -92,24 +97,25 @@ public class HandlerAdapter {
 
             Object returnValue = method.invoke(controllerInstance, args);
 
+            if (method.isAnnotationPresent(RestAPI.class)) {
+                JsonResponse jsonResponse = new JsonResponse("success", 200, "OK", returnValue);
+                String json = JsonConverter.toJson(jsonResponse);
 
-
-            if (returnValue instanceof String) {
-
-                response.setContentType("text/html;charset=UTF-8");
-
-                response.getWriter().println(returnValue);
-
-            } else if (returnValue instanceof ModelView) {
-
-                ModelView mv = (ModelView) returnValue;
-
-                mv.getData().forEach(request::setAttribute);
-
-                RequestDispatcher dispatcher = request.getRequestDispatcher(mv.getView());
-
-                dispatcher.forward(request, response);
-
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter out = response.getWriter();
+                out.print(json);
+                out.flush();
+            } else {
+                if (returnValue instanceof String) {
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().println(returnValue);
+                } else if (returnValue instanceof ModelView) {
+                    ModelView mv = (ModelView) returnValue;
+                    mv.getData().forEach(request::setAttribute);
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(mv.getView());
+                    dispatcher.forward(request, response);
+                }
             }
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
