@@ -9,6 +9,7 @@ D:\Framework\framework\src\main\java\etu\sprint\annotation\RequestParameter.java
 D:\Framework\framework\src\main\java\etu\sprint\connexion\Connexion.java
 D:\Framework\framework\src\main\java\etu\sprint\handler\HandlerAdapter.java
 D:\Framework\framework\src\main\java\etu\sprint\model\ControllerMethod.java
+D:\Framework\framework\src\main\java\etu\sprint\model\DataObject.java
 D:\Framework\framework\src\main\java\etu\sprint\model\HttpMethod.java
 D:\Framework\framework\src\main\java\etu\sprint\model\MethodInfo.java
 D:\Framework\framework\src\main\java\etu\sprint\model\ModelView.java
