@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.annotation.MultipartConfig;
+
+@MultipartConfig
 public class FrontServlet extends HttpServlet {
 
     private HandlerAdapter handlerAdapter;
