@@ -85,6 +85,8 @@ public class HandlerAdapter {
 
                 } else if (parameter.getType() == FileUpload.class) {
                      handleFileUploadParameter(parameter, i, args, request);
+                } else if (parameter.getType() == HttpServletRequest.class) {
+                     args[i] = request;
                 } else if (isComplexType(parameter.getType())) {
 
                     args[i] = handleComplexType(parameter.getType(), requestParams);

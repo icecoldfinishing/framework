@@ -116,6 +116,16 @@ public class FrontServlet extends HttpServlet {
                 return;
             }
         } else {
+            // Check if it's a static resource handled by default servlet
+            try {
+                if (getServletContext().getResource(path) != null) {
+                   getServletContext().getNamedDispatcher("default").forward(request, response);
+                   return;
+                }
+            } catch (Exception e) {
+                // Ignore and proceed to 404
+            }
+
             // 404 Not Found
             response.setContentType("text/plain;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
