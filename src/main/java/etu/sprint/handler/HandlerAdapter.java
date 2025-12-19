@@ -15,6 +15,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import etu.sprint.model.FileUpload;
 
 
 
@@ -81,6 +83,10 @@ public class HandlerAdapter {
 
                     handleMapParameter(i, args, pathVariables, requestParams);
 
+                } else if (parameter.getType() == FileUpload.class) {
+                     handleFileUploadParameter(parameter, i, args, request);
+                } else if (parameter.getType() == HttpServletRequest.class) {
+                     args[i] = request;
                 } else if (isComplexType(parameter.getType())) {
 
                     args[i] = handleComplexType(parameter.getType(), requestParams);
@@ -243,6 +249,28 @@ public class HandlerAdapter {
     }
 
 
+
+    private void handleFileUploadParameter(Parameter parameter, int index, Object[] args, HttpServletRequest request) throws ServletException, IOException {
+        String paramName = parameter.getName();
+        etu.sprint.annotation.RequestParameter rp = parameter.getAnnotation(etu.sprint.annotation.RequestParameter.class);
+        if (rp != null) {
+            paramName = rp.value();
+        }
+
+        try {
+            Part part = request.getPart(paramName);
+            if (part != null) {
+                FileUpload fileUpload = new FileUpload();
+                fileUpload.setFileName(part.getSubmittedFileName());
+                fileUpload.setBytes(part.getInputStream().readAllBytes());
+                fileUpload.setContentType(part.getContentType());
+                args[index] = fileUpload;
+            }
+        } catch (Exception e) {
+             // Handle exceptions or ignore if part is missing/invalid
+             // e.printStackTrace();
+        }
+    }
 
     private String capitalize(String str) {
 

@@ -11,6 +11,7 @@ D:\Framework\framework\src\main\java\etu\sprint\connexion\Connexion.java
 D:\Framework\framework\src\main\java\etu\sprint\handler\HandlerAdapter.java
 D:\Framework\framework\src\main\java\etu\sprint\model\ControllerMethod.java
 D:\Framework\framework\src\main\java\etu\sprint\model\DataObject.java
+D:\Framework\framework\src\main\java\etu\sprint\model\FileUpload.java
 D:\Framework\framework\src\main\java\etu\sprint\model\HttpMethod.java
 D:\Framework\framework\src\main\java\etu\sprint\model\JsonResponse.java
 D:\Framework\framework\src\main\java\etu\sprint\model\MethodInfo.java
