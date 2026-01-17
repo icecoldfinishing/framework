@@ -22,8 +22,11 @@ import etu.sprint.model.Session;
 
 
 import etu.sprint.annotation.RestAPI;
+import etu.sprint.annotation.Authorized;
 import etu.sprint.model.JsonResponse;
 import etu.sprint.util.JsonConverter;
+import etu.sprint.util.AuthorizationManager;
+import jakarta.servlet.ServletContext;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -48,7 +51,17 @@ import java.util.Map;
 
 public class HandlerAdapter {
 
+    private AuthorizationManager authorizationManager;
 
+    public HandlerAdapter() {
+        // AuthorizationManager sera initialisé avec ServletContext si nécessaire
+    }
+
+    public HandlerAdapter(ServletContext servletContext) {
+        if (servletContext != null) {
+            this.authorizationManager = new AuthorizationManager(servletContext);
+        }
+    }
 
     public void handle(HttpServletRequest request, HttpServletResponse response, ControllerMethod controllerMethod,
 
@@ -56,9 +69,22 @@ public class HandlerAdapter {
 
         try {
 
-            Object controllerInstance = controllerMethod.controllerClass.getDeclaredConstructor().newInstance();
-
             Method method = controllerMethod.method;
+
+            // Vérifier l'autorisation avant d'exécuter la méthode
+            if (method.isAnnotationPresent(Authorized.class)) {
+                if (authorizationManager == null) {
+                    // Initialiser avec le ServletContext de la requête si pas encore fait
+                    authorizationManager = new AuthorizationManager(request.getServletContext());
+                }
+                Authorized authorizedAnnotation = method.getAnnotation(Authorized.class);
+                if (!authorizationManager.isAuthorized(request, response, authorizedAnnotation)) {
+                    // La réponse d'erreur a déjà été envoyée par AuthorizationManager
+                    return;
+                }
+            }
+
+            Object controllerInstance = controllerMethod.controllerClass.getDeclaredConstructor().newInstance();
 
             Parameter[] parameters = method.getParameters();
 
