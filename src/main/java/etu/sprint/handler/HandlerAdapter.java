@@ -13,10 +13,11 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 
 import jakarta.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import etu.sprint.model.FileUpload;
+import etu.sprint.model.Session;
 
 
 
@@ -75,7 +76,9 @@ public class HandlerAdapter {
 
 
 
-                if (parameter.isAnnotationPresent(etu.sprint.annotation.RequestParameter.class)) {
+                if (parameter.getType() == Session.class || parameter.isAnnotationPresent(etu.sprint.annotation.Session.class)) {
+                    handleSessionParameter(i, args, request);
+                } else if (parameter.isAnnotationPresent(etu.sprint.annotation.RequestParameter.class)) {
 
                     handleRequestParameter(parameter, i, args, pathVariables, requestParams);
 
@@ -270,6 +273,12 @@ public class HandlerAdapter {
              // Handle exceptions or ignore if part is missing/invalid
              // e.printStackTrace();
         }
+    }
+
+    private void handleSessionParameter(int index, Object[] args, HttpServletRequest request) {
+        HttpSession httpSession = request.getSession();
+        Session session = new Session(httpSession);
+        args[index] = session;
     }
 
     private String capitalize(String str) {
