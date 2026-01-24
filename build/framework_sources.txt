@@ -1,4 +1,5 @@
 D:\Framework\framework\src\main\java\etu\sprint\annotation\AnnotationController.java
+D:\Framework\framework\src\main\java\etu\sprint\annotation\Authorized.java
 D:\Framework\framework\src\main\java\etu\sprint\annotation\DeleteMapping.java
 D:\Framework\framework\src\main\java\etu\sprint\annotation\GetMapping.java
 D:\Framework\framework\src\main\java\etu\sprint\annotation\PatchMapping.java
@@ -19,6 +20,7 @@ D:\Framework\framework\src\main\java\etu\sprint\model\MethodInfo.java
 D:\Framework\framework\src\main\java\etu\sprint\model\ModelView.java
 D:\Framework\framework\src\main\java\etu\sprint\model\RouteMatcher.java
 D:\Framework\framework\src\main\java\etu\sprint\model\Session.java
+D:\Framework\framework\src\main\java\etu\sprint\util\AuthorizationManager.java
 D:\Framework\framework\src\main\java\etu\sprint\util\ClassScanner.java
 D:\Framework\framework\src\main\java\etu\sprint\util\JsonConverter.java
 D:\Framework\framework\src\main\java\etu\sprint\util\TypeConverter.java
