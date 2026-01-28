@@ -21,6 +21,7 @@ public class AuthorizationManager {
     private static final String ROLE_ADMIN = "admin";
     private static final String ROLE_ANONYM = "anonym";
     private static final String ROLE_ALL = "all";
+    private static final String ROLE_AUTHENTICATED = "authenticated"; // any authenticated user
     
     private static final String SESSION_USER_KEY = "user";
     private static final String SESSION_ROLE_KEY = "role";
@@ -99,6 +100,16 @@ public class AuthorizationManager {
             }
         }
         
+        if (allowedRolesSet.contains(ROLE_AUTHENTICATED)) {
+            // Any authenticated user regardless of specific role
+            if (isAuthenticated) {
+                return true;
+            } else {
+                sendUnauthorizedResponse(response, "Authentification requise");
+                return false;
+            }
+        }
+
         if (allowedRolesSet.contains(ROLE_ADMIN)) {
             // "admin" nécessite authentification et rôle admin
             if (!isAuthenticated) {
@@ -225,6 +236,35 @@ public class AuthorizationManager {
             return role != null ? role.toString() : null;
         }
         return null;
+    }
+
+    /**
+     * Récupère la liste des rôles configurés pour l'application.
+     * Source: WEB-INF/auth.properties -> custom.roles=role1,role2
+     * @return Ensemble des rôles disponibles; défaut: ["user", "admin"].
+     */
+    public Set<String> getConfiguredRoles() {
+        Set<String> roles = new HashSet<>();
+        String configured = configProperties.getProperty("custom.roles", null);
+        if (configured != null && !configured.isBlank()) {
+            Arrays.stream(configured.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .forEach(roles::add);
+        }
+        if (roles.isEmpty()) {
+            roles.add("user");
+            roles.add("admin");
+        }
+        return roles;
+    }
+
+    /**
+     * Récupère le rôle par défaut depuis la configuration, sinon "user".
+     */
+    public String getDefaultRole() {
+        String def = configProperties.getProperty("default.role", null);
+        return (def != null && !def.isBlank()) ? def.trim() : "user";
     }
 }
 
