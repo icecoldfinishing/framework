@@ -15,11 +15,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Authorized {
-    /**
-     * Les rôles autorisés pour accéder à cette méthode.
-     * Par défaut, "all" signifie que tout le monde peut accéder.
-     * @return Tableau des rôles autorisés
-     */
+
     String[] value() default {"all"};
 }
 
